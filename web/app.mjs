@@ -1,5 +1,5 @@
 import { by, node, row, read, options, comma } from "./ui.mjs";
-import { reversals } from "./model.mjs";
+import { reversals, routeHistory, persistentReversals } from "./model.mjs";
 const pretty = (d) => d.charAt(0) + d.slice(1).toLowerCase() + "bound",
   pct = (v) => (v == null ? "—" : comma(v) + "%");
 try {
@@ -20,6 +20,20 @@ try {
     data.years.join(", ") +
     " · retrieved " +
     data.retrieved;
+  function routeButton(route) {
+    const button = node("button", route, "tablelink");
+    button.type = "button";
+    button.addEventListener("click", () => {
+      by("route").value = route;
+      draw();
+      by("route").focus();
+    });
+    return button;
+  }
+  function peakLead(peak) {
+    if (!peak) return "Missing";
+    return peak.leader ? pretty(peak.leader) + " +" + comma(peak.gap) : "Tied";
+  }
   function draw() {
     const year = by("year").value,
       route = by("route").value,
@@ -71,6 +85,38 @@ try {
         chart.append(wrap);
       }
     }
+    const groups = data.years.map((year) => ({ year, routes: group(year) }));
+    const history = routeHistory(groups, route);
+    by("patterns").replaceChildren();
+    by("leads").replaceChildren();
+    for (const { axis, years } of history) {
+      const complete = years.filter((y) => y.complete).length;
+      const count = years.filter((y) => y.reversed).length;
+      const missing = years.length - complete;
+      const prefix = history.length > 1 ? axis.join(" / ") + " · " : "";
+      by("patterns").append(node("p", prefix + "Route " + route + " reversed in " +
+        count + " of " + complete + " comparable years. " + missing +
+        (missing === 1 ? " year has" : " years have") + " missing measurements."));
+      for (const y of years.slice().reverse()) {
+        const result = !y.complete ? "Incomplete" : y.reversed ? "Reversal" :
+          !y.am.leader || !y.pm.leader ? "Tied peak" : "Same leader";
+        by("leads").append(row([y.year, peakLead(y.am), peakLead(y.pm), result]));
+      }
+    }
+    const persistent = persistentReversals(groups);
+    const repeated = persistent.find((r) => r.route === route);
+    if (repeated) {
+      const position = 1 + persistent.filter((r) => r.score > repeated.score).length;
+      by("patterns").append(node("p", "Its smallest lead was " + comma(repeated.score) +
+        " points, ranking " + position + " of " + persistent.length +
+        " repeating reversals in this season and day type."));
+    }
+    by("persistent-count").textContent = persistent.length + " reversals that repeat every year";
+    by("persistent").replaceChildren(...persistent.map((r) => {
+      const tr = row([r.route, pretty(r.am), pretty(r.pm), comma(r.score)]);
+      tr.firstChild.replaceChildren(routeButton(r.route));
+      return tr;
+    }));
     const rows = [];
     for (const y of data.years.slice().reverse()) {
       const obs = group(y)[route] || {};
@@ -85,14 +131,7 @@ try {
         pretty(r.am) + " +" + comma(r.amGap),
         pretty(r.pm) + " +" + comma(r.pmGap),
       ]);
-      const button = node("button", r.route, "tablelink");
-      button.type = "button";
-      button.addEventListener("click", () => {
-        by("route").value = r.route;
-        draw();
-        by("route").focus();
-      });
-      tr.firstChild.replaceChildren(button);
+      tr.firstChild.replaceChildren(routeButton(r.route));
       by("rank").append(tr);
     }
     by("count").textContent = ranks.length + " directional reversals";
