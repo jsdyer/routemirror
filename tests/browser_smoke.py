@@ -29,8 +29,12 @@ def main():
                 errors = []
                 page.on("pageerror", lambda error: errors.append(str(error)))
                 page.goto(f"http://127.0.0.1:{server.server_port}/routemirror/")
-                page.locator("#history tr").first.wait_for()
+                page.locator("#leads tr").first.wait_for()
                 assert page.locator("#route").input_value() == "555"
+                assert "comparable years" in page.locator("#patterns").inner_text()
+                page.locator("#persistent-count").click()
+                page.locator("#persistent button").first.click()
+                assert page.locator("#route").input_value() == page.locator("#persistent button").first.inner_text()
                 assert "%" in page.locator("#chart").inner_text()
                 page.locator("#count").click()
                 page.locator("#rank button").first.click()

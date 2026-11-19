@@ -44,7 +44,26 @@
           busiest point on trips. Values can exceed 100%. Morning and afternoon
           use the report’s 06:00 and 15:00 time bands.
         </p>
-        <h3>Compare years</h3>
+        <h3>Does the reversal repeat?</h3>
+        <div id="patterns"></div>
+        <div class="scroll">
+          <table aria-label="Directional leads across years">
+            <thead><tr><th>Year</th><th>Morning lead (points)</th><th>Afternoon lead (points)</th><th>Pattern</th></tr></thead>
+            <tbody id="leads"></tbody>
+          </table>
+        </div>
+        <details>
+          <summary id="persistent-count">Reversals that repeat every year</summary>
+          <p>These routes have the same morning and afternoon leaders in every available year for the selected season and day type. The smallest lead across all peaks and years determines their order.</p>
+          <div class="scroll">
+            <table aria-label="Routes with repeat reversals">
+              <thead><tr><th>Route</th><th>Morning leader</th><th>Afternoon leader</th><th>Smallest lead (points)</th></tr></thead>
+              <tbody id="persistent"></tbody>
+            </table>
+          </div>
+        </details>
+        <details>
+          <summary>Peak load factors by year and direction</summary>
         <div class="scroll">
           <table>
             <thead>
@@ -58,6 +77,7 @@
             <tbody id="history"></tbody>
           </table>
         </div>
+        </details>
         <details>
           <summary id="count">Directional reversals</summary>
           <p>

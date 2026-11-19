@@ -1,7 +1,7 @@
 {
   "id": "routemirror",
   "title": "Route Mirror",
-  "description": "Find Metro Vancouver bus routes whose busier direction reverses between the morning and afternoon peaks.",
+  "description": "See which Metro Vancouver bus routes switch their busier direction between peaks and which repeat the pattern every year.",
   "category": "places",
   "tags": [
     "TransLink",

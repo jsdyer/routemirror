@@ -3,12 +3,14 @@
 [Open Route Mirror](https://coolcode.ca/routemirror/) to find Metro Vancouver bus routes whose busier direction reverses between the morning and afternoon peaks.
 
 <!-- coolcode:guide -->
-Start with route 555 on fall weekdays. Compare earlier years, or open the reversal ranking to find other routes with a pronounced morning and afternoon switch.
+Start with route 555 on fall weekdays to see how its westbound morning lead and eastbound afternoon lead change across years. Open the repeat-reversal ranking to compare its smallest lead with other routes.
 <!-- /coolcode:guide -->
 
 ## Reading the records
 
 The importer discovers the newest linked TSPR bus peak-load CSV and selects the 06 and 15 time bands. The measure is the published average peak load factor in percent, allowing values above 100. The two directions must swap leads for a reversal. Rankings sort by the smaller of the AM and PM directional gaps. Missing or tied measurements cannot qualify. The source excludes discontinued routes and may omit individual cells. The figures describe historic averages at the busiest point of trips and do not measure pass-ups at a stop.
+
+The cross-year table holds season and day type constant and compares opposing directions on the same axis. A year is comparable when both directions have morning and afternoon measurements. Tied peaks count as comparable. The repeat-reversal ranking requires the same morning leader and opposite afternoon leader in every edition year, with at least two years. Its score is the smallest directional gap across those years and peaks, in percentage points.
 
 ## Sources and maintenance
 
