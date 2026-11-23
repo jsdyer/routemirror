@@ -18,7 +18,7 @@
   "data_info": {
     "mode": "snapshot",
     "detail": "TransLink publishes average peak passenger loads by route, direction, time band, season, day type and year.",
-    "cadence": "Monthly edition check",
+    "cadence": "Monthly",
     "probes": [
       {
         "label": "Data retrieved",
