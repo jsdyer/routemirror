@@ -13,14 +13,16 @@
     <header>
       <nav>
         <a href="https://coolcode.ca/#places">← CoolCode.ca</a
-        ><a href="{{SOURCE_URL}}#readme">Sources and guide ↗</a>
+        ><a href="{{SOURCE_URL}}#readme">Sources and guide</a>
       </nav>
     </header>
     <main>
       <h1>{{TITLE}}</h1>
-      <p class="lead">{{DESCRIPTION}}</p>
+      <p class="lead">Choose a Metro Vancouver bus route to see which direction carries the fuller buses in the morning and afternoon.</p>
+      <!-- route-welcome -->
+      <p class="recordnav"><a href="./records/">Browse route records</a> · <a href="./records/tour/">Follow the three-route tour</a></p>
       <p id="edition" class="edition"></p>
-      <section class="report">
+      <section class="report" id="explorer">
         <h2>Directional peak loads</h2>
         <div class="filters">
           <label>Bus route<select id="route"></select></label
@@ -40,6 +42,7 @@
         </div>
         <p id="finding" class="finding" role="status"></p>
         <div id="chart"></div>
+        <p id="annual"></p><p><a id="profile" href="./records/">Read the route record</a></p>
         <p class="note">
           Average peak passenger load as a percentage of vehicle capacity at the
           busiest point on trips. Values can exceed 100%. Morning and afternoon
@@ -100,11 +103,11 @@
           </div>
         </details>
       </section>
-      <noscript>Enable JavaScript to explore the data.</noscript>
+      <noscript><style>#explorer{display:none}</style><p>Each <a href="./records/">published route record</a> includes the values, years and sources.</p></noscript>
       <footer>
         <a
           href="https://www.translink.ca/plans-and-projects/strategies-plans-and-guidelines/managing-the-transit-network"
-          >Transit Service Performance Review ↗</a
+          >Transit Service Performance Review</a
         >
         ·
         <a href="https://coolcode.ca/transferwindow/"

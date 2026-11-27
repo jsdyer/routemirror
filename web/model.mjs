@@ -66,3 +66,28 @@ export function persistentReversals(groups) {
   }
   return rank(result);
 }
+
+export const dayNames = {MF: "weekdays", Sat: "Saturdays", "Sun/Hol": "Sundays and holidays"};
+export const routeOrder = (a, b) => a.localeCompare(b, "en-CA", {numeric: true});
+export const directionName = d => d[0] + d.slice(1).toLowerCase() + "bound";
+export const routeSlug = route => route.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+export const routePath = route => "records/routes/" + routeSlug(route) + "/";
+export const conditions = data => Array.from(new Set(Object.keys(data.entries).map(k => k.split("|").slice(1).join("|"))))
+  .map(k => k.split("|")).sort(([a,b],[c,d]) => a.localeCompare(c) || ["MF","Sat","Sun/Hol"].indexOf(b)-["MF","Sat","Sun/Hol"].indexOf(d));
+export const conditionPath = (s,d) => "records/conditions/" + routeSlug(s) + "-" + routeSlug(d) + "/";
+export const allRoutes = data => [...new Set([...Object.values(data.entries), ...Object.values(data.annual || {})]
+  .flatMap(group => Object.keys(group).filter(route => Object.values(group[route]).flat().some(Number.isFinite))))].sort(routeOrder);
+export const appParams = (route,year,season,day) => new URLSearchParams({route,year,season,day}).toString();
+export const usableRecord = record => Object.values(record || {}).flat().some(Number.isFinite);
+
+export function selectionFor(data, route, season = "Fall", day = "MF") {
+  const years = data.years.slice().sort((a,b)=>b-a);
+  const selections = conditions(data);
+  const preferences = [[season,day], ...selections.filter(([s,d])=>s !== season || d !== day)];
+  for (const [s,d] of preferences) {
+    const y = years.find(y => usableRecord(data.entries[[y,s,d].join("|")]?.[route]));
+    if (y) return {route,year:y,season:s,day:d};
+  }
+  const y = years.find(year=>data.annual?.[year]?.[route]);
+  return y ? {route,year:y,season:preferences[0][0],day:preferences[0][1]} : null;
+}

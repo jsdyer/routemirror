@@ -1,5 +1,4 @@
 """Refresh a compact statistical extract from the latest published TSPR CSV."""
-from collections import defaultdict
 import csv
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -18,10 +17,13 @@ class Links(HTMLParser):
     def __init__(self):
         super().__init__()
         self.matches = []
+        self.annual = {}
     def handle_starttag(self, tag, attrs):
         href = dict(attrs).get("href","")
         if tag == "a" and (match := re.search(PATTERN,href,re.I)):
             self.matches.append((int(match[1]),urljoin(INDEX,href)))
+        if tag == "a" and (match := re.search(r"tspr(\d{4})_bus_yearline\.csv(?:[?#]|$)", href, re.I)):
+            self.annual[int(match[1])] = urljoin(INDEX, href)
 
 def number(value):
     if value.strip().upper() in ("","NULL","N/A"): return None
@@ -37,8 +39,13 @@ def main():
     entries, years, n = extract(csv.DictReader(io.StringIO(raw)))
     if edition not in years or len(years)<2 or n<100:
         raise ValueError("Incomplete TSPR edition")
+    annual_source = links.annual[edition]
+    annual_raw = urlopen(annual_source,timeout=80).read().decode("utf-8-sig")
+    annual = extract_annual(csv.DictReader(io.StringIO(annual_raw)))
+    if set(annual) != {str(y) for y in years}:
+        raise ValueError("Annual and directional series cover different years")
     now = datetime.now(timezone.utc).date().isoformat()
-    obj = {"edition":edition,"years":sorted(years),"source":source,"retrieved":now,"entries":entries}
+    obj = {"edition":edition,"years":sorted(years),"source":source,"retrieved":now,"entries":entries,"annual_source":annual_source,"annual":annual}
     status = {"retrieved":now,"records":n,"edition":str(edition),"start":str(min(years)),"end":str(max(years))}
     folder = ROOT/"web/data"
     folder.mkdir(exist_ok=True,parents=True)
@@ -52,6 +59,7 @@ OUT = "loads"
 
 def extract(rows):
     groups, years, n = {}, set(), 0
+    seen = set()
     for r in rows:
         if r["HourRange"] not in ("6","15"): continue
         year = int(r["SeasonYear"])
@@ -62,13 +70,28 @@ def extract(rows):
         record = groups.setdefault(key,{}).setdefault(route,{}).setdefault(direction,[None,None])
         slot = int(r["HourRange"]=="15")
         value = number(r["Average_Peak_Load_Factor"])
-        if record[slot] is not None: raise ValueError("Duplicate peak-load slot")
+        identity = (key, route, direction, slot)
+        if identity in seen: raise ValueError("Duplicate peak-load slot")
+        seen.add(identity)
         record[slot] = value
         years.add(year)
         n += 1
     if not any("555" in routes for routes in groups.values()):
         raise ValueError("Route 555 absent")
     return groups, years, n
+
+def extract_annual(rows):
+    years = {}
+    for row in rows:
+        year = str(int(row["CalendarYear"]))
+        route = row["Lineno_renamed"].strip()
+        values = [number(row[k]) for k in ("AnnualBoardings", "Average_Peak_Load_Factor")]
+        if not route or route in years.setdefault(year, {}):
+            raise ValueError("Blank or duplicate annual route ID")
+        if any(v is not None for v in values):
+            years[year][route] = values
+    return years
+
 
 if __name__ == "__main__":
     main()

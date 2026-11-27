@@ -17,7 +17,7 @@
   "access": "browser",
   "data_info": {
     "mode": "snapshot",
-    "detail": "TransLink publishes average peak passenger loads by route, direction, time band, season, day type and year.",
+    "detail": "TransLink’s annual bus route totals and seasonal directional peak-load tables report Metro Vancouver boardings and load factors.",
     "cadence": "Monthly",
     "probes": [
       {
@@ -44,5 +44,9 @@
         ]
       }
     ]
+  },
+  "result_directory": {
+    "path": "records/",
+    "title": "Metro Vancouver bus route loads and peak comparisons"
   }
 }

@@ -1,5 +1,5 @@
 import { by, node, row, read, options, comma } from "./ui.mjs";
-import { reversals, routeHistory, persistentReversals } from "./model.mjs";
+import { reversals, routeHistory, persistentReversals, appParams, allRoutes, routePath, routeOrder, usableRecord, conditions, dayNames } from "./model.mjs";
 const pretty = (d) => d.charAt(0) + d.slice(1).toLowerCase() + "bound",
   pct = (v) => (v == null ? "—" : comma(v) + "%");
 try {
@@ -13,6 +13,9 @@ try {
       .reverse()
       .map((y) => [y, y]),
   );
+  const contexts = conditions(data);
+  options(by("season"), [...new Set(contexts.map(([s])=>s))].map(s=>[s,s]), "Fall");
+  options(by("day"), [...new Set(contexts.map(([,d])=>d))].map(d=>[d,dayNames[d] || d]), "MF");
   by("edition").textContent =
     "Transit Service Performance Review " +
     data.edition +
@@ -25,7 +28,7 @@ try {
     button.type = "button";
     button.addEventListener("click", () => {
       by("route").value = route;
-      draw();
+      by("route").dispatchEvent(new Event("change"));
       by("route").focus();
     });
     return button;
@@ -41,6 +44,11 @@ try {
       record = routes[route] || {};
     const ranks = reversals(routes),
       match = ranks.find((r) => r.route === route);
+    by("welcome").textContent = "Showing Route " + route + " · " + by("season").value + " " + (dayNames[by("day").value] || by("day").value) + " " + year + ". Change the route or season below.";
+    by("profile").href = "./" + routePath(route);
+    by("profile").textContent = "Read Route " + route + "’s full record";
+    const annual = data.annual?.[year]?.[route];
+    by("annual").textContent = Number.isFinite(annual?.[0]) ? "Across the full year, TransLink reports " + Math.round(annual[0]).toLocaleString("en-CA") + " boardings on this route." : "Annual boardings are unavailable for this route and year.";
     by("finding").textContent = match
       ? "Route " +
         route +
@@ -56,7 +64,7 @@ try {
       : "Route " +
         route +
         " · " +
-        (Object.values(record).flat().filter(Number.isFinite).length < 4
+        (!usableRecord(record) ? "No peak measurements are published for these conditions." : Object.values(record).flat().filter(Number.isFinite).length < 4
           ? "Some directional measurements are unavailable."
           : "The busier direction does not reverse in this selection.");
     const directions = Object.keys(record).sort(),
@@ -137,9 +145,9 @@ try {
     by("count").textContent = ranks.length + " directional reversals";
   }
   function updateRoutes(preferred) {
-    const routes = Object.keys(group(by("year").value)).sort((a, b) =>
-      a.localeCompare(b, undefined, { numeric: true }),
-    );
+    const routeSet = new Set([...Object.keys(group(by("year").value)), ...Object.keys(data.annual?.[by("year").value] || {})]);
+    if (published.has(preferred || by("route").value)) routeSet.add(preferred || by("route").value);
+    const routes = [...routeSet].filter(r => published.has(r)).sort(routeOrder);
     options(
       by("route"),
       routes.map((r) => [r, r]),
@@ -147,10 +155,22 @@ try {
     );
     draw();
   }
+  const published = new Set(allRoutes(data));
+  const params = new URLSearchParams(location.search);
+  for (const field of ["year","season","day"]) {
+    const el = by(field), value = params.get(field);
+    if ([...el.options].some(option => option.value === value)) el.value = value;
+  }
+  by("route").addEventListener("change", () => {
+    draw();
+    history.replaceState(null,"","?" + appParams(by("route").value,by("year").value,by("season").value,by("day").value));
+  });
   for (const id of ["year", "season", "day"])
-    by(id).addEventListener("change", () => updateRoutes());
-  by("route").addEventListener("change", draw);
-  updateRoutes("555");
+    by(id).addEventListener("change", () => {
+      updateRoutes();
+      history.replaceState(null,"","?" + appParams(by("route").value,by("year").value,by("season").value,by("day").value));
+    });
+  updateRoutes(published.has(params.get("route")) ? params.get("route") : "555");
 } catch {
   by("finding").textContent = "The peak-load snapshot could not be loaded.";
 }

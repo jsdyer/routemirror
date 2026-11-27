@@ -221,3 +221,25 @@ footer {
     grid-template-columns: 2.8rem 1fr;
   }
 }
+
+.welcome,.recordnav {margin:.45rem 0;}
+.recordnav a,.jump a {font-weight:700;}
+.recordpage h1 {font-size:clamp(2.45rem,6vw,4.8rem);max-width:22ch;}
+.recordpage h2 {margin-top:1.8rem;}
+.recordpage h3 {margin:1.5rem 0 .5rem;}
+.recordpage caption {text-align:left;font-weight:700;padding:.7rem 0;}
+.recordpage th:first-child {min-width:5rem;}
+.records-list {padding-left:1.3rem;}
+.records-list li {padding:.25rem 0;}
+.routegrid {display:grid;grid-template-columns:repeat(auto-fill,minmax(7.2rem,1fr));gap:.35rem .8rem;}
+.routegrid a {padding:.3rem 0;}
+.jump {margin:.8rem 0 1.3rem;}
+@media(max-width:540px) {
+  h1 {margin-top:1.2rem;}
+  .filters {display:grid;grid-template-columns:1fr 1fr;}
+  .filters label {min-width:0;}
+  .recordpage .scroll {border-right:1px solid var(--line);}
+  .recordpage th,.recordpage td {padding:.4rem;}
+}
+
+.recordpage th small {display:block;font-weight:400;white-space:nowrap;}

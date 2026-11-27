@@ -41,3 +41,14 @@ test("repeat ranking requires a consistent axis, direction and complete edition 
   assert.equal(routeHistory(groups, "3")[0].years[1].pm.leader, "EAST");
   assert.equal(routeHistory(groups, "4")[0].years[1].complete, false);
 });
+
+test("annual-only routes, source-labelled combined routes and usable fallbacks", async () => {
+  const {allRoutes, routePath, selectionFor, appParams} = await import("../web/model.mjs");
+  const data={years:[2024,2025], entries:{"2025|Fall|MF":{"005/006":{WEST:[null,null]}, "98":{EAST:[null,null]}},
+    "2024|Summer|Sat":{"NEW":{NORTH:[0,null]}}}, annual:{"2025":{"005/006":[12345,35], "209":[0,null]}}};
+  assert.deepEqual(allRoutes(data),["005/006","209","NEW"]);
+  assert.equal(routePath("005/006"),"records/routes/005-006/");
+  assert.deepEqual(selectionFor(data,"NEW"),{route:"NEW",year:2024,season:"Summer",day:"Sat"});
+  assert.equal(selectionFor(data,"209").year,2025);
+  assert.equal(new URLSearchParams(appParams("005/006",2025,"Fall","Sun/Hol")).get("route"),"005/006");
+});
