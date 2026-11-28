@@ -58,6 +58,7 @@ def build(root=ROOT):
         shutil.copytree(web, stage)
         index = stage / "index.html"
         subprocess.run(["node", str(Path(__file__).with_name("build_records.mjs")), str(stage)], check=True)
+        subprocess.run(["node", str(Path(__file__).with_name("build_compass.mjs")), str(stage)], check=True)
         page = index.read_text(encoding="utf-8")
         for token, key in {"TITLE": "title", "DESCRIPTION": "description", "TOOL_ID": "id", "SOURCE_URL": "source"}.items():
             placeholder = "{{" + token + "}}"

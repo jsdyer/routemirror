@@ -179,6 +179,7 @@ for(const route of routes){
   buckets.get(group).push(route);
 }
 for(const [g,rs] of buckets) directory+='<section><h3>'+esc(g)+'</h3><div class="routegrid">'+rs.map(r=>link(profile(r),"Route "+r)).join("")+'</div></section>';
+directory += '<p><a href="../compass.html">Compare route orientations in the GTFS transit compass</a></p>';
 emit("records/","Metro Vancouver bus route records","Compare annual boardings and directional peak loads for "+routes.length+" published route series in TransLink’s "+data.edition+" edition.",directory,"CollectionPage");
 const main=join(stage,"index.html");
 writeFileSync(main,readFileSync(main,"utf8").replace("<!-- route-welcome -->",'<p class="welcome" id="welcome">'+esc("Showing Route "+first.route+" · "+name(baseS,baseD)+" "+firstY+". Change the route or season below.")+'</p><noscript>'+intro(introText)+'</noscript>'));

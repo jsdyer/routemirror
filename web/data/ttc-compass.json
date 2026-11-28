@@ -1,0 +1,11 @@
+{
+  "source": "https://open.toronto.ca/dataset/ttc-routes-and-schedules/",
+  "licence": "https://open.toronto.ca/open-data-license/",
+  "retrieved": "2026-11-28",
+  "feed_sha256": "d198496b0e71bb1bb56be81cac854c76edd99651b33fccea050590b6d5cf4818",
+  "example_sha256": "49f693ca9dec6d99695e1e9afa8aa145e6bbcfd26037e1dad23f2e65b5c51338",
+  "route_count": 3,
+  "shape_count": 160,
+  "service_start": "20261101",
+  "service_end": "20261221"
+}

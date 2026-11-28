@@ -75,6 +75,17 @@ def main():
                 assert "99" in plain.locator("h1").inner_text()
                 plain.screenshot(path=str(screenshots / "route-phone.png"),full_page=True)
                 plain.close()
+                page.goto(f"http://127.0.0.1:{server.server_port}/routemirror/compass.html")
+                page.wait_for_function("document.querySelector('#status').textContent.includes('69.3%')")
+                assert 'Bloor' in page.locator('#line option:checked').inner_text()
+                page.locator('#line').select_option(label='Line 4 (Sheppard)')
+                assert '91.6%' in page.locator('#status').inner_text()
+                page.locator('#files').set_input_files({
+                    "name":"shapes.txt", "mimeType":"text/plain",
+                    "buffer":b"shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence\na,45,0,0\na,46,0,1"})
+                page.wait_for_function("document.querySelector('#status').textContent.includes('N–S (100%')")
+                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+                page.screenshot(path=str(screenshots/"compass-mobile.png"), full_page=True)
                 assert not errors, errors
                 browser.close()
             print("Browser checks passed: source data, filters and mobile layout")

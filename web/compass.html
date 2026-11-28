@@ -1,0 +1,21 @@
+<!doctype html><html lang="en-CA"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Transit route orientation compass for GTFS shapes · Route Mirror</title><meta name="description" content="See which direction a transit line runs. Compare Toronto subway shapes or open your own GTFS feed to measure route alignment by distance.">
+<link rel="canonical" href="https://coolcode.ca/routemirror/compass.html"><link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="./compass.css"><script type="module" src="./compass.mjs"></script><script defer src="/assets/tool-metrics.js" referrerpolicy="no-referrer"></script>
+</head><body data-tool="routemirror"><header><nav><a href="./">← Route Mirror</a><a href="https://coolcode.ca/">CoolCode.ca</a></nav></header>
+<main><h1>Transit route compass</h1><p class="lead">Which way does a transit line run? Explore Toronto’s subway lines, or open an agency’s GTFS route shapes from your device.</p>
+<p data-coolcode-commitments><small>No CoolCode account · No ads · <a href="/about/#our-commitments">How CoolCode works</a></small></p>
+<section class="report compass-report"><h2 id="name">Toronto subway example</h2>
+<label for="line">Route</label><select id="line" disabled><option>Loading route shapes…</option></select>
+<p id="status" role="status">Reading the example route geometry…</p>
+<div class="rose"><div><canvas id="plot" width="500" height="500" role="img" aria-label="Compass rose of route orientation. Exact values are in the adjacent table."></canvas><small>Opposite spokes show the same axis. Spoke length shows its share relative to the longest spoke.</small></div>
+<table><caption>Share of measured shape length</caption><thead><tr><th>Axis</th><th>Share</th><th>Shape km</th></tr></thead><tbody id="values"></tbody></table></div></section>
+<section class="report"><h2>Open your own feed</h2><p>Choose a GTFS ZIP or select an extracted <strong>shapes.txt</strong>. Include <strong>trips.txt</strong> to filter by route and <strong>routes.txt</strong> to see route names. The files stay in your browser.</p>
+<label for="files">Local GTFS files</label><input id="files" type="file" accept=".zip,.txt" multiple><button type="button" id="restore">Show Toronto example</button></section>
+<section><h2>What the rose measures</h2><p>Each segment between consecutive points contributes its length to the nearest of eight compass axes. A train travelling east and the same path travelling west both count toward E–W. Each selected shape ID counts once, regardless of how often trips use it. Distinct shape IDs can trace the same corridor, so overlaps and route variants can contribute repeatedly.</p>
+<p>Use rail feeds to explore the alignment of published train routes or a bus feed to explore the alignment of bus paths. These are scheduled route geometries. The rose does not measure track inventory, ridership or service frequency.</p></section>
+<section><h2>Toronto example and sources</h2><!-- toronto-comparison --><p id="source">The example uses the TTC subway shapes from the City of Toronto feed. <a href="https://open.toronto.ca/dataset/ttc-routes-and-schedules/">TTC Routes and Schedules</a> · <a href="./data/ttc-subway-example.zip" download>Download the route-shape extract</a>.</p>
+<p>Contains information licensed under the <a href="https://open.toronto.ca/open-data-license/">Open Government Licence – Toronto</a>. The Toronto example is a dated illustration. Upload a newer agency feed to inspect a different schedule.</p>
+<p><a href="./records/">Explore Metro Vancouver bus ridership by route</a> · <a href="https://gtfs.org/documentation/schedule/reference/#shapestxt">GTFS shapes reference</a></p></section>
+<noscript><p>Enable JavaScript to calculate bearings, or download the example to inspect the source geometry.</p></noscript></main></body></html>

@@ -1,0 +1,23 @@
+import {readFileSync, writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {createRequire} from 'node:module';
+import {createHash} from 'node:crypto';
+import {pathToFileURL} from 'node:url';
+const stage=process.argv[2];
+const {analyze,axes}=await import(pathToFileURL(join(stage,'compass-model.mjs')));
+const {unzipSync}=createRequire(import.meta.url)(join(stage,'vendor/fflate-0.8.2.js'));
+const file=readFileSync(join(stage,'data/ttc-subway-example.zip'));
+const meta=JSON.parse(readFileSync(join(stage,'data/ttc-compass.json')));
+if(createHash('sha256').update(file).digest('hex')!==meta.example_sha256)throw Error('Toronto example hash mismatch');
+const records=Object.fromEntries(Object.entries(unzipSync(file)).map(([k,v])=>[k,new TextDecoder().decode(v)]));
+const data=analyze(records);
+if(data.routes.length!==meta.route_count || data.all.count!==meta.shape_count)throw Error('Toronto example coverage changed');
+const esc=v=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+const dates=value=>value.replace(/^(\d{4})(\d{2})(\d{2})$/,'$1-$2-$3');
+const recordsHtml=data.routes.map(r=>{
+  const sum=r.bins.reduce((a,b)=>a+b,0),max=Math.max(...r.bins),axis=axes[r.bins.indexOf(max)];
+  return '<li>'+esc(r.label)+' · '+(100*max/sum).toFixed(1)+'% '+axis+'</li>';
+}).join('');
+const excerpt='<p>Example downloaded '+esc(meta.retrieved)+'. The source calendar covers '+esc(dates(meta.service_start))+' to '+esc(dates(meta.service_end))+'. Predominant axes in this snapshot:</p><ul>'+recordsHtml+'</ul>';
+const page=join(stage,'compass.html');
+writeFileSync(page,readFileSync(page,'utf8').replace('<!-- toronto-comparison -->',excerpt));
