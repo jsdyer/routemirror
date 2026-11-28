@@ -139,7 +139,9 @@ for(const r of routes) {
     return [link(selection(r,y,ss,dd),name(ss,dd)),lead(comparison?.am),lead(comparison?.pm),pattern(comparison)];
   }))+'<p>Lead sizes are percentage points. '+link(root+conditionPath(s,d),"Compare all routes on "+name(s,d))+'</p>';
   body+=crosslinks(r,y,s,d);
-  if(r==="555") body+='<p>'+link("https://coolcode.ca/transferwindow/","Compare scheduled Route 555 transfer times in Transfer Window")+'</p>';
+  if(r==="555") body+='<h2>Connecting at Carvolth</h2><p>'+
+    link("https://coolcode.ca/field-notes/carvolth-555-to-501-connection/","How much time do you need to change from the 555 to the 501?")+
+    ' Follow one weekday arrival from Bay 1 to Bay 3, or '+link("https://coolcode.ca/transferwindow/?connection=carvolth-555-to-501","test the connection with your own walking allowance")+'.</p>';
   const index=tourRoutes.indexOf(r);
   if(index>=0) body+='<aside class="finding">Tour stop '+(index+1)+' of '+tourRoutes.length+' · '+(index<tourRoutes.length-1?link(profile(tourRoutes[index+1]),"Continue to Route "+tourRoutes[index+1]):link(root+"records/tour/","Return to the tour"))+'</aside>';
   emit(routePath(r),"Route "+r+" bus loads and boardings",name(s,d)+", "+y+". "+summary,body);
